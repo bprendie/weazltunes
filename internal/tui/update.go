@@ -47,9 +47,13 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		return m, m.loadSoma()
 	case "3":
 		m.mode = modeXiph
-		m.status = "enter a Xiph genre/search and press enter"
+		m.status = "enter a Xiph genre/search or stream URL"
 		m.err = ""
 		m.input.Focus()
+	case "4":
+		m.showMyStations()
+	case "ctrl+p":
+		m.promoteSelectedOrInput()
 	case "enter":
 		return m.handleEnter()
 	case "/":
@@ -64,6 +68,14 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 func (m Model) handleEnter() (Model, tea.Cmd) {
 	if m.input.Focused() {
+		if st, ok := stationFromURL(m.input.Value()); ok {
+			m.saveMyStation(st)
+			m.showMyStations()
+			m.play(st)
+			m.input.SetValue("")
+			m.input.Blur()
+			return m, nil
+		}
 		m.status = "searching Xiph"
 		m.err = ""
 		return m, m.searchXiph(m.input.Value())
@@ -72,6 +84,29 @@ func (m Model) handleEnter() (Model, tea.Cmd) {
 		m.play(directoryStation(item))
 	}
 	return m, nil
+}
+
+func (m *Model) promoteSelectedOrInput() {
+	if st, ok := stationFromURL(m.input.Value()); ok {
+		m.saveMyStation(st)
+		m.promotePreset(st)
+		m.input.SetValue("")
+		m.input.Blur()
+		m.showPresets()
+		m.status = "added to presets"
+		return
+	}
+	if item, ok := m.list.SelectedItem().(stationItem); ok {
+		m.promotePreset(directoryStation(item))
+		m.showPresets()
+		m.status = "added to presets"
+		return
+	}
+	if m.playing != nil {
+		m.promotePreset(*m.playing)
+		m.showPresets()
+		m.status = "added to presets"
+	}
 }
 
 func (m *Model) resize(width, height int) {

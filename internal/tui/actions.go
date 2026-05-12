@@ -18,6 +18,14 @@ func (m *Model) showPresets() {
 	m.err = ""
 }
 
+func (m *Model) showMyStations() {
+	m.mode = modeMyStations
+	m.list.Title = "my stations"
+	m.setStations(myStations(m.cfg))
+	m.status = "my stations"
+	m.err = ""
+}
+
 func (m *Model) play(st directory.Station) {
 	if err := m.player.Play(st.URL); err != nil {
 		m.err = err.Error()
@@ -32,6 +40,24 @@ func (m *Model) stop() {
 	m.player.Stop()
 	m.playing = nil
 	m.status = "stopped"
+}
+
+func (m *Model) saveMyStation(st directory.Station) {
+	m.cfg.SaveMyStation(presetFromStation(st))
+	if err := config.Save(m.cfg); err != nil {
+		m.err = err.Error()
+		return
+	}
+	m.status = "saved to my stations"
+}
+
+func (m *Model) promotePreset(st directory.Station) {
+	m.cfg.PromotePreset(presetFromStation(st))
+	if err := config.Save(m.cfg); err != nil {
+		m.err = err.Error()
+		return
+	}
+	m.status = "added to presets"
 }
 
 func (m *Model) setStations(stations []directory.Station) {
@@ -60,14 +86,6 @@ func (m Model) searchXiph(q string) tea.Cmd {
 		}
 		return loadedMsg{stations: stations, status: fmt.Sprintf("loaded %d Xiph streams", len(stations))}
 	}
-}
-
-func presetStations(cfg config.Config) []directory.Station {
-	out := make([]directory.Station, 0, len(cfg.Presets))
-	for _, p := range cfg.Presets {
-		out = append(out, directory.Station{Name: p.Name, URL: p.URL, Source: "Preset", Description: p.URL})
-	}
-	return out
 }
 
 func directoryStation(item stationItem) directory.Station {

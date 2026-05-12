@@ -5,10 +5,12 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Config struct {
-	Presets []Preset `json:"presets"`
+	Presets    []Preset `json:"presets"`
+	MyStations []Preset `json:"my_stations"`
 }
 
 type Preset struct {
@@ -39,6 +41,28 @@ func Load() (Config, error) {
 		cfg.Presets = defaultConfig().Presets
 	}
 	return cfg, nil
+}
+
+func (c *Config) SaveMyStation(st Preset) {
+	st.Name = strings.TrimSpace(st.Name)
+	st.URL = strings.TrimSpace(st.URL)
+	if st.URL == "" {
+		return
+	}
+	c.MyStations = upsert(c.MyStations, st)
+}
+
+func (c *Config) PromotePreset(st Preset) {
+	st.Name = strings.TrimSpace(st.Name)
+	st.URL = strings.TrimSpace(st.URL)
+	if st.URL == "" {
+		return
+	}
+	presets := upsert(c.Presets, st)
+	c.Presets = presets
+	if len(c.Presets) > 5 {
+		c.Presets = c.Presets[:5]
+	}
 }
 
 func Save(cfg Config) error {
@@ -74,4 +98,15 @@ func defaultConfig() Config {
 			{Name: "Deep Space One", URL: "https://somafm.com/deepspaceone.pls"},
 		},
 	}
+}
+
+func upsert(stations []Preset, st Preset) []Preset {
+	out := []Preset{st}
+	for _, existing := range stations {
+		if strings.EqualFold(existing.URL, st.URL) {
+			continue
+		}
+		out = append(out, existing)
+	}
+	return out
 }

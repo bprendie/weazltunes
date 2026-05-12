@@ -12,7 +12,7 @@ func (m Model) View() string {
 	contentWidth := max(40, m.width-4)
 	b.WriteString(gradientLogo(logo))
 	b.WriteString("\n\n")
-	b.WriteString(m.styles.header.Render("[1] presets  [2] SomaFM  [3] Xiph genres/search  [/] search  [enter] play  [s] stop  [q] quit"))
+	b.WriteString(m.styles.header.Render("[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [ctrl+p] preset  [enter] play/add  [s] stop  [q] quit"))
 	b.WriteString("\n")
 	b.WriteString(m.input.View())
 	b.WriteString("\n\n")

@@ -19,6 +19,7 @@ const (
 	modePresets mode = iota
 	modeSoma
 	modeXiph
+	modeMyStations
 )
 
 type Model struct {
@@ -81,9 +82,9 @@ func (m Model) Init() tea.Cmd {
 
 func newSearchInput() textinput.Model {
 	ti := textinput.New()
-	ti.Placeholder = "genre or station search"
-	ti.Prompt = "search > "
-	ti.CharLimit = 80
+	ti.Placeholder = "genre, station search, or stream url"
+	ti.Prompt = "tune > "
+	ti.CharLimit = 240
 	ti.Width = 42
 	return ti
 }
