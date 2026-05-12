@@ -17,7 +17,7 @@ func (m Model) View() string {
 		b.WriteString(m.styles.header.Render("WeazlTunes"))
 	}
 	b.WriteString("\n\n")
-	help := "[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [ctrl+p] preset  [ctrl+r] rename  [space] pause  [enter] play/add  [s] stop  [q] quit"
+	help := "[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [ctrl+p] preset  [ctrl+r] rename  [ctrl+d] delete  [space] pause  [enter] play/add  [s] stop  [q] quit"
 	b.WriteString(m.styles.header.Render(ansi.Wordwrap(help, contentWidth, " []/")))
 	b.WriteString("\n")
 	b.WriteString(m.input.View())

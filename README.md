@@ -83,6 +83,7 @@ apps on your machine, it can build this.
 - `enter`: search, play selected station, or save/play a pasted URL
 - `ctrl+p`: add pasted, selected, or playing station to presets
 - `ctrl+r`: rename selected preset or saved station
+- `ctrl+d`: delete selected preset or saved station
 - `space`: pause/resume playback
 - `s`: stop playback
 - `esc`: leave the tune box

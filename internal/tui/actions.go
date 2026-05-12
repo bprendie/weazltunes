@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/bprendie/weazltunes/internal/audio"
-	"github.com/bprendie/weazltunes/internal/config"
 	"github.com/bprendie/weazltunes/internal/directory"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -81,70 +80,6 @@ func (m *Model) stopMeter() {
 	}
 	m.meter = nil
 	m.energy = audio.Sample{}
-}
-
-func (m *Model) saveMyStation(st directory.Station) {
-	m.cfg.SaveMyStation(presetFromStation(st))
-	if err := config.Save(m.cfg); err != nil {
-		m.err = err.Error()
-		return
-	}
-	m.status = "saved to my stations"
-}
-
-func (m *Model) promotePreset(st directory.Station) {
-	m.cfg.PromotePreset(presetFromStation(st))
-	if err := config.Save(m.cfg); err != nil {
-		m.err = err.Error()
-		return
-	}
-	m.status = "added to presets"
-}
-
-func (m *Model) startRenameSelected() {
-	item, ok := m.list.SelectedItem().(stationItem)
-	if !ok || (m.mode != modePresets && m.mode != modeMyStations) {
-		m.err = "select a preset or my station to rename"
-		return
-	}
-	st := directoryStation(item)
-	m.renaming = &st
-	m.input.SetValue(st.Name)
-	m.input.Prompt = "rename > "
-	m.input.Focus()
-	m.status = "enter a new station name"
-	m.err = ""
-}
-
-func (m *Model) finishRename() {
-	if m.renaming == nil {
-		return
-	}
-	name := m.input.Value()
-	renamed := false
-	if m.mode == modePresets {
-		renamed = m.cfg.RenamePreset(m.renaming.URL, name)
-	} else if m.mode == modeMyStations {
-		renamed = m.cfg.RenameMyStation(m.renaming.URL, name)
-	}
-	if !renamed {
-		m.err = "rename failed"
-		return
-	}
-	if err := config.Save(m.cfg); err != nil {
-		m.err = err.Error()
-		return
-	}
-	m.input.SetValue("")
-	m.input.Prompt = tunePrompt
-	m.input.Blur()
-	m.renaming = nil
-	if m.mode == modePresets {
-		m.showPresets()
-	} else {
-		m.showMyStations()
-	}
-	m.status = "renamed"
 }
 
 func (m *Model) setStations(stations []directory.Station) {

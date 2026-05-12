@@ -73,6 +73,18 @@ func (c *Config) RenameMyStation(url, name string) bool {
 	return renameByURL(c.MyStations, url, name)
 }
 
+func (c *Config) DeletePreset(url string) bool {
+	next, deleted := deleteByURL(c.Presets, url)
+	c.Presets = next
+	return deleted
+}
+
+func (c *Config) DeleteMyStation(url string) bool {
+	next, deleted := deleteByURL(c.MyStations, url)
+	c.MyStations = next
+	return deleted
+}
+
 func Save(cfg Config) error {
 	path, err := Path()
 	if err != nil {
@@ -131,4 +143,17 @@ func renameByURL(stations []Preset, url, name string) bool {
 		}
 	}
 	return false
+}
+
+func deleteByURL(stations []Preset, url string) ([]Preset, bool) {
+	out := stations[:0]
+	deleted := false
+	for _, station := range stations {
+		if strings.EqualFold(station.URL, url) {
+			deleted = true
+			continue
+		}
+		out = append(out, station)
+	}
+	return out, deleted
 }

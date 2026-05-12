@@ -59,6 +59,8 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m.promoteSelectedOrInput()
 	case "ctrl+r":
 		m.startRenameSelected()
+	case "ctrl+d":
+		m.deleteSelected()
 	case " ":
 		m.togglePause()
 	case "enter":
