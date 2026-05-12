@@ -12,7 +12,7 @@ func (m Model) View() string {
 	var b strings.Builder
 	contentWidth := max(40, m.width-4)
 	if contentWidth >= maxLineWidth(logo) {
-		b.WriteString(gradientLogo(logo))
+		b.WriteString(renderLogo(logo, contentWidth))
 	} else {
 		b.WriteString(m.styles.header.Render("WeazlTunes"))
 	}
