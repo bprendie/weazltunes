@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"github.com/bprendie/weazltunes/internal/audio"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -23,7 +24,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case errMsg:
 		m.err = msg.err.Error()
 	case tickMsg:
-		m.visualizer.Step(m.playing != nil)
+		m.drainMeter()
+		m.visualizer.Step(m.playing != nil && !m.paused, m.energy)
 		cmds = append(cmds, tick())
 	}
 
@@ -36,6 +38,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c", "q":
+		m.stopMeter()
 		m.player.Stop()
 		return m, tea.Quit
 	case "1":
@@ -71,6 +74,25 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m.stop()
 	}
 	return m, nil
+}
+
+func (m *Model) drainMeter() {
+	if m.meter == nil {
+		m.energy = audio.Sample{}
+		return
+	}
+	for {
+		select {
+		case sample, ok := <-m.meter.Samples():
+			if !ok {
+				m.meter = nil
+				return
+			}
+			m.energy = sample
+		default:
+			return
+		}
+	}
 }
 
 func (m Model) handleEnter() (Model, tea.Cmd) {

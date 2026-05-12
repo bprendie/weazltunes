@@ -56,10 +56,13 @@ WEAZLTUNES_SKIP_LAUNCH=1 ./scripts/install.sh
 
 - Go 1.25 or newer
 - `mpv` in `PATH`
+- `ffmpeg` in `PATH` for music-reactive visualizer bars
 
 WeazlTunes is the tuner. `mpv` is the amp. That means MP3, AAC, Ogg, playlist
 URLs, direct streams, and YouTube live streams work as well as your local `mpv`
-build supports them.
+build supports them. `ffmpeg` is the meter: WeazlTunes uses it to decode a
+low-rate copy of the active stream and feed RMS/transient energy into the bar
+visualizer.
 
 ## Build From Source
 
@@ -116,8 +119,9 @@ WeazlTunes falls back to the directory XML feed for broader text matching.
 
 The colors come from WeazlChat, inverted for the radio sibling: a yellow
 WeazlTunes wordmark with purple diagonal rails, dark panels, mint status text,
-and a Harmonica-powered spring visualizer that wiggles without explaining
-itself in plain text.
+and Harmonica-powered bars that react to the active music stream when `ffmpeg`
+can decode it. If the meter cannot start for a particular URL, playback keeps
+going and the bars fall back to synthetic motion.
 
 ## Config
 

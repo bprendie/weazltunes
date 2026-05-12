@@ -59,6 +59,14 @@ check_mpv() {
   echo "Install mpv with your package manager, then tune in." >&2
 }
 
+check_ffmpeg() {
+  if command -v ffmpeg >/dev/null 2>&1; then
+    return
+  fi
+  echo "ffmpeg was not found on PATH." >&2
+  echo "$APP_NAME will still play streams, but reactive visualizer bars need ffmpeg." >&2
+}
+
 choose_profile() {
   local shell_name
   shell_name="$(basename "${SHELL:-}")"
@@ -108,6 +116,7 @@ add_to_path() {
 
 check_go_version
 check_mpv
+check_ffmpeg
 
 mkdir -p "$BIN_DIR" "$GO_CACHE" "$GO_MOD_CACHE"
 

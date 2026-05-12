@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bprendie/weazltunes/internal/audio"
 	"github.com/bprendie/weazltunes/internal/config"
 	"github.com/bprendie/weazltunes/internal/directory"
 	"github.com/bprendie/weazltunes/internal/player"
@@ -29,6 +30,7 @@ type Model struct {
 	styles     styles
 	client     directory.Client
 	player     *player.Player
+	meter      *audio.Meter
 	list       list.Model
 	input      textinput.Model
 	mode       mode
@@ -36,6 +38,7 @@ type Model struct {
 	err        string
 	playing    *directory.Station
 	paused     bool
+	energy     audio.Sample
 	renaming   *directory.Station
 	width      int
 	height     int
