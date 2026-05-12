@@ -17,12 +17,12 @@ func (m Model) View() string {
 		b.WriteString(m.styles.header.Render("WeazlTunes"))
 	}
 	b.WriteString("\n\n")
-	help := "[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [ctrl+p] preset  [ctrl+r] rename  [space] pause  [enter] play/add  [s] stop  [q] quit"
+	help := "[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [v] viz  [ctrl+p] preset  [ctrl+r] rename  [space] pause  [enter] play/add  [s] stop  [q] quit"
 	b.WriteString(m.styles.header.Render(ansi.Wordwrap(help, contentWidth, " []/")))
 	b.WriteString("\n")
 	b.WriteString(m.input.View())
 	b.WriteString("\n\n")
-	b.WriteString(m.styles.panel.Width(contentWidth).Render(m.visualizer.View(m.styles)))
+	b.WriteString(m.styles.panel.Width(contentWidth).Render(m.visualizer.View(m.styles, contentWidth)))
 	b.WriteString("\n")
 	b.WriteString(m.list.View())
 	b.WriteString("\n")

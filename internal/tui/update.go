@@ -23,7 +23,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case errMsg:
 		m.err = msg.err.Error()
 	case tickMsg:
-		m.visualizer.Step(m.playing != nil)
+		m.visualizer.Step(m.playing != nil && !m.paused)
 		cmds = append(cmds, tick())
 	}
 
@@ -56,6 +56,8 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m.promoteSelectedOrInput()
 	case "ctrl+r":
 		m.startRenameSelected()
+	case "v":
+		m.status = "visualizer: " + m.visualizer.Toggle()
 	case " ":
 		m.togglePause()
 	case "enter":
