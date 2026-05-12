@@ -65,6 +65,14 @@ func (c *Config) PromotePreset(st Preset) {
 	}
 }
 
+func (c *Config) RenamePreset(url, name string) bool {
+	return renameByURL(c.Presets, url, name)
+}
+
+func (c *Config) RenameMyStation(url, name string) bool {
+	return renameByURL(c.MyStations, url, name)
+}
+
 func Save(cfg Config) error {
 	path, err := Path()
 	if err != nil {
@@ -109,4 +117,18 @@ func upsert(stations []Preset, st Preset) []Preset {
 		out = append(out, existing)
 	}
 	return out
+}
+
+func renameByURL(stations []Preset, url, name string) bool {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return false
+	}
+	for i := range stations {
+		if strings.EqualFold(stations[i].URL, url) {
+			stations[i].Name = name
+			return true
+		}
+	}
+	return false
 }

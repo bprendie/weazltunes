@@ -32,13 +32,31 @@ func (m *Model) play(st directory.Station) {
 		return
 	}
 	m.playing = &st
+	m.paused = false
 	m.status = "playing " + st.Name
 	m.err = ""
+}
+
+func (m *Model) togglePause() {
+	paused, err := m.player.TogglePause()
+	if err != nil {
+		m.err = err.Error()
+		return
+	}
+	m.paused = paused
+	if paused {
+		m.status = "paused"
+		return
+	}
+	if m.playing != nil {
+		m.status = "playing " + m.playing.Name
+	}
 }
 
 func (m *Model) stop() {
 	m.player.Stop()
 	m.playing = nil
+	m.paused = false
 	m.status = "stopped"
 }
 
@@ -58,6 +76,52 @@ func (m *Model) promotePreset(st directory.Station) {
 		return
 	}
 	m.status = "added to presets"
+}
+
+func (m *Model) startRenameSelected() {
+	item, ok := m.list.SelectedItem().(stationItem)
+	if !ok || (m.mode != modePresets && m.mode != modeMyStations) {
+		m.err = "select a preset or my station to rename"
+		return
+	}
+	st := directoryStation(item)
+	m.renaming = &st
+	m.input.SetValue(st.Name)
+	m.input.Prompt = "rename > "
+	m.input.Focus()
+	m.status = "enter a new station name"
+	m.err = ""
+}
+
+func (m *Model) finishRename() {
+	if m.renaming == nil {
+		return
+	}
+	name := m.input.Value()
+	renamed := false
+	if m.mode == modePresets {
+		renamed = m.cfg.RenamePreset(m.renaming.URL, name)
+	} else if m.mode == modeMyStations {
+		renamed = m.cfg.RenameMyStation(m.renaming.URL, name)
+	}
+	if !renamed {
+		m.err = "rename failed"
+		return
+	}
+	if err := config.Save(m.cfg); err != nil {
+		m.err = err.Error()
+		return
+	}
+	m.input.SetValue("")
+	m.input.Prompt = tunePrompt
+	m.input.Blur()
+	m.renaming = nil
+	if m.mode == modePresets {
+		m.showPresets()
+	} else {
+		m.showMyStations()
+	}
+	m.status = "renamed"
 }
 
 func (m *Model) setStations(stations []directory.Station) {

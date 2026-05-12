@@ -22,6 +22,8 @@ const (
 	modeMyStations
 )
 
+const tunePrompt = "tune > "
+
 type Model struct {
 	cfg        config.Config
 	styles     styles
@@ -33,6 +35,8 @@ type Model struct {
 	status     string
 	err        string
 	playing    *directory.Station
+	paused     bool
+	renaming   *directory.Station
 	width      int
 	height     int
 	visualizer Visualizer
@@ -83,14 +87,14 @@ func (m Model) Init() tea.Cmd {
 func newSearchInput() textinput.Model {
 	ti := textinput.New()
 	ti.Placeholder = "genre, station search, or stream url"
-	ti.Prompt = "tune > "
+	ti.Prompt = tunePrompt
 	ti.CharLimit = 240
 	ti.Width = 42
 	return ti
 }
 
 func newStationList() list.Model {
-	l := list.New(nil, list.NewDefaultDelegate(), 80, 20)
+	l := list.New(nil, newStationDelegate(), 80, 20)
 	l.Title = "top 5 presets"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(true)

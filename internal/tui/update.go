@@ -54,11 +54,18 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m.showMyStations()
 	case "ctrl+p":
 		m.promoteSelectedOrInput()
+	case "ctrl+r":
+		m.startRenameSelected()
+	case " ":
+		m.togglePause()
 	case "enter":
 		return m.handleEnter()
 	case "/":
 		m.input.Focus()
 	case "esc":
+		m.renaming = nil
+		m.input.SetValue("")
+		m.input.Prompt = tunePrompt
 		m.input.Blur()
 	case "s":
 		m.stop()
@@ -68,6 +75,10 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 func (m Model) handleEnter() (Model, tea.Cmd) {
 	if m.input.Focused() {
+		if m.renaming != nil {
+			m.finishRename()
+			return m, nil
+		}
 		if st, ok := stationFromURL(m.input.Value()); ok {
 			m.saveMyStation(st)
 			m.showMyStations()
@@ -118,6 +129,9 @@ func (m *Model) resize(width, height int) {
 
 func (m Model) updateFocused(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
+	if key, ok := msg.(tea.KeyMsg); ok && key.String() == " " {
+		return m, nil
+	}
 	if m.input.Focused() {
 		m.input, cmd = m.input.Update(msg)
 		return m, cmd

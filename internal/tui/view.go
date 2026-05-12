@@ -5,14 +5,20 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/x/ansi"
 )
 
 func (m Model) View() string {
 	var b strings.Builder
 	contentWidth := max(40, m.width-4)
-	b.WriteString(gradientLogo(logo))
+	if contentWidth >= maxLineWidth(logo) {
+		b.WriteString(gradientLogo(logo))
+	} else {
+		b.WriteString(m.styles.header.Render("WeazlTunes"))
+	}
 	b.WriteString("\n\n")
-	b.WriteString(m.styles.header.Render("[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [ctrl+p] preset  [enter] play/add  [s] stop  [q] quit"))
+	help := "[1] presets  [2] SomaFM  [3] Xiph  [4] my stations  [/] tune  [ctrl+p] preset  [ctrl+r] rename  [space] pause  [enter] play/add  [s] stop  [q] quit"
+	b.WriteString(m.styles.header.Render(ansi.Wordwrap(help, contentWidth, " []/")))
 	b.WriteString("\n")
 	b.WriteString(m.input.View())
 	b.WriteString("\n\n")
@@ -29,9 +35,13 @@ func (m Model) View() string {
 
 func (m Model) statusLine() string {
 	if m.playing != nil {
-		return m.styles.status.Render("now: " + m.playing.Name + " <" + m.playing.URL + ">")
+		state := "now: "
+		if m.paused {
+			state = "paused: "
+		}
+		return m.styles.status.Render(ansi.Wordwrap(state+m.playing.Name+" <"+m.playing.URL+">", max(20, m.width-4), " /_-<>"))
 	}
-	return m.styles.status.Render(m.status)
+	return m.styles.status.Render(ansi.Wordwrap(m.status, max(20, m.width-4), " /_-"))
 }
 
 func tick() tea.Cmd {
