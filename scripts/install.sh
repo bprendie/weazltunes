@@ -1,22 +1,133 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-prefix="${WEAZLTUNES_PREFIX:-$HOME/.weazltunes}"
-bin_dir="$prefix/bin"
+APP_NAME="weazltunes"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+INSTALL_ROOT="${WEAZLTUNES_HOME:-"$HOME/.weazltunes"}"
+BIN_DIR="$INSTALL_ROOT/bin"
+BIN_PATH="$BIN_DIR/$APP_NAME"
+GO_CACHE="${GOCACHE:-"$REPO_ROOT/.gocache"}"
+GO_MOD_CACHE="${GOMODCACHE:-"$REPO_ROOT/.gomodcache"}"
 
-mkdir -p "$bin_dir"
-go build -o "$bin_dir/weazltunes" "$root/cmd/weazltunes"
+go_version_number() {
+  go version | awk '{print $3}' | sed 's/^go//' | cut -d. -f1,2
+}
 
-case ":$PATH:" in
-  *":$bin_dir:"*) ;;
-  *)
-    shell_rc="$HOME/.bashrc"
-    if [ -n "${ZSH_VERSION:-}" ]; then
-      shell_rc="$HOME/.zshrc"
+version_at_least() {
+  local current="$1"
+  local required="$2"
+  local current_major current_minor required_major required_minor
+  current_major="${current%%.*}"
+  current_minor="${current#*.}"
+  required_major="${required%%.*}"
+  required_minor="${required#*.}"
+  [[ "$current_major" =~ ^[0-9]+$ && "$current_minor" =~ ^[0-9]+$ ]] || return 1
+  [[ "$required_major" =~ ^[0-9]+$ && "$required_minor" =~ ^[0-9]+$ ]] || return 1
+  if (( current_major > required_major )); then
+    return 0
+  fi
+  if (( current_major == required_major && current_minor >= required_minor )); then
+    return 0
+  fi
+  return 1
+}
+
+check_go_version() {
+  if ! command -v go >/dev/null 2>&1; then
+    echo "Go is required to build $APP_NAME, but it was not found on PATH." >&2
+    echo "Install Go, then rerun ./scripts/install.sh." >&2
+    exit 1
+  fi
+
+  local required current
+  required="$(awk '/^go / {print $2; exit}' "$REPO_ROOT/go.mod" | cut -d. -f1,2)"
+  current="$(go_version_number)"
+  if ! version_at_least "$current" "$required"; then
+    echo "Go $required or newer is required to build $APP_NAME." >&2
+    echo "Found Go $current at $(command -v go)." >&2
+    echo "Update Go, then rerun ./scripts/install.sh." >&2
+    exit 1
+  fi
+}
+
+check_mpv() {
+  if command -v mpv >/dev/null 2>&1; then
+    return
+  fi
+  echo "mpv was not found on PATH." >&2
+  echo "$APP_NAME installs fine without it, but playback needs mpv." >&2
+  echo "Install mpv with your package manager, then tune in." >&2
+}
+
+choose_profile() {
+  local shell_name
+  shell_name="$(basename "${SHELL:-}")"
+  case "$shell_name" in
+    zsh) echo "$HOME/.zshrc" ;;
+    bash)
+      if [[ -f "$HOME/.bashrc" ]]; then
+        echo "$HOME/.bashrc"
+      else
+        echo "$HOME/.profile"
+      fi
+      ;;
+    fish) echo "" ;;
+    *) echo "$HOME/.profile" ;;
+  esac
+}
+
+add_to_path() {
+  local path_line marker_begin marker_end profile
+  path_line='export PATH="$HOME/.weazltunes/bin:$PATH"'
+  marker_begin="# >>> weazltunes path >>>"
+  marker_end="# <<< weazltunes path <<<"
+
+  if [[ ":$PATH:" == *":$BIN_DIR:"* ]]; then
+    return
+  fi
+
+  profile="$(choose_profile)"
+  if [[ -n "$profile" ]]; then
+    touch "$profile"
+    if ! grep -Fq "$marker_begin" "$profile"; then
+      {
+        echo ""
+        echo "$marker_begin"
+        echo "$path_line"
+        echo "$marker_end"
+      } >> "$profile"
+      echo "Added $BIN_DIR to PATH in $profile"
+    else
+      echo "PATH block already exists in $profile"
     fi
-    printf '\nexport PATH="%s:$PATH"\n' "$bin_dir" >> "$shell_rc"
-    ;;
-esac
+  else
+    echo "Fish shell detected. Add this to your fish config:"
+    echo "set -gx PATH $BIN_DIR \$PATH"
+  fi
+}
 
-printf 'installed %s\n' "$bin_dir/weazltunes"
+check_go_version
+check_mpv
+
+mkdir -p "$BIN_DIR" "$GO_CACHE" "$GO_MOD_CACHE"
+
+echo "Building $APP_NAME..."
+(
+  cd "$REPO_ROOT"
+  GOCACHE="$GO_CACHE" GOMODCACHE="$GO_MOD_CACHE" go build -buildvcs=false -o "$BIN_PATH" ./cmd/weazltunes
+)
+
+chmod 0755 "$BIN_PATH"
+add_to_path
+
+echo "Installed $APP_NAME to $BIN_PATH"
+echo "If your shell cannot find it yet, restart the shell or run:"
+echo '  export PATH="$HOME/.weazltunes/bin:$PATH"'
+
+if [[ "${WEAZLTUNES_SKIP_LAUNCH:-}" == "1" ]]; then
+  echo "Skipping first launch because WEAZLTUNES_SKIP_LAUNCH=1"
+else
+  echo ""
+  echo "Launching $APP_NAME..."
+  exec "$BIN_PATH"
+fi
