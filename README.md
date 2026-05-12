@@ -96,7 +96,7 @@ apps on your machine, it can build this.
 Paste a direct stream URL into the tune box and press `enter`:
 
 ```text
-https://radio.prendie.io/radio.mp3
+https://example.com/stream.mp3
 ```
 
 It gets saved to `my stations` and starts playing immediately. Paste a YouTube
@@ -136,8 +136,8 @@ saved stations:
 {
   "presets": [
     {
-      "name": "Prendie Radio",
-      "url": "https://radio.prendie.io/radio.mp3"
+      "name": "Late Night Stream",
+      "url": "https://example.com/stream.mp3"
     }
   ],
   "my_stations": []
