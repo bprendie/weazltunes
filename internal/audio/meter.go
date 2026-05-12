@@ -13,6 +13,7 @@ import (
 type Sample struct {
 	Level     float64
 	Transient float64
+	Bands     []float64
 	Live      bool
 }
 
@@ -29,7 +30,7 @@ func StartMeter(url string) (*Meter, error) {
 		return nil, errors.New("ffmpeg not found")
 	}
 	url = ResolveStreamURL(context.Background(), url)
-	cmd := exec.Command(bin, "-nostdin", "-v", "error", "-i", url, "-vn", "-f", "s16le", "-ac", "1", "-ar", "8000", "pipe:1")
+	cmd := exec.Command(bin, "-nostdin", "-v", "error", "-i", url, "-vn", "-f", "s16le", "-ac", "1", "-ar", "44100", "pipe:1")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
@@ -62,7 +63,8 @@ func (m *Meter) Stop() {
 func (m *Meter) read(r io.Reader) {
 	defer close(m.done)
 	defer close(m.out)
-	buf := make([]byte, 2048)
+	analyzer := NewSpectrumAnalyzer(44100, 24, 20, 18000)
+	buf := make([]byte, 4096)
 	previous := 0.0
 	for {
 		n, err := io.ReadFull(r, buf)
@@ -70,7 +72,12 @@ func (m *Meter) read(r io.Reader) {
 			return
 		}
 		level := rms(buf[:n])
-		sample := Sample{Level: level, Transient: math.Max(0, level-previous), Live: true}
+		sample := Sample{
+			Level:     level,
+			Transient: math.Max(0, level-previous),
+			Bands:     analyzer.Bands(buf[:n]),
+			Live:      true,
+		}
 		previous = level*0.72 + previous*0.28
 		select {
 		case m.out <- sample:

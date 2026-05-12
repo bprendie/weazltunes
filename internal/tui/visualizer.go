@@ -43,12 +43,22 @@ func (v Visualizer) energyAt(i int, sample audio.Sample) float64 {
 	if !sample.Live {
 		return 0.5 + 0.5*math.Sin(float64(v.tick+i)*0.35)
 	}
-	tilt := 0.72 + 0.28*math.Sin(float64(i)*0.63)
-	energy := sample.Level*tilt + sample.Transient*6.5
-	if energy > 1 {
+	if i < len(sample.Bands) {
+		energy := sample.Bands[i]*0.86 + sample.Transient*2.1
+		return clamp01(energy)
+	}
+	energy := sample.Level + sample.Transient*2.1
+	return clamp01(energy)
+}
+
+func clamp01(value float64) float64 {
+	if value < 0 {
+		return 0
+	}
+	if value > 1 {
 		return 1
 	}
-	return energy
+	return value
 }
 
 func (v Visualizer) View(styles styles) string {
