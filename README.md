@@ -77,7 +77,6 @@ apps on your machine, it can build this.
 - `3`: Xiph search mode
 - `4`: my stations
 - `/`: focus the tune box
-- `v`: switch between sphere and bars visualizers
 - `enter`: search, play selected station, or save/play a pasted URL
 - `ctrl+p`: add pasted, selected, or playing station to presets
 - `ctrl+r`: rename selected preset or saved station
@@ -117,12 +116,8 @@ WeazlTunes falls back to the directory XML feed for broader text matching.
 
 The colors come from WeazlChat, inverted for the radio sibling: a yellow
 WeazlTunes wordmark with purple diagonal rails, dark panels, mint status text,
-and a Harmonica-powered `sphere` visualizer inspired by the Vegas Sphere happy
-face. The old bar visualizer is still available with `v`.
-
-The sphere is playback-reactive today. True transient sync is the next audio
-backend step: WeazlTunes will need an energy signal from decoded audio, while
-Harmonica handles the smooth motion once that signal exists.
+and a Harmonica-powered spring visualizer that wiggles without explaining
+itself in plain text.
 
 ## Config
 
