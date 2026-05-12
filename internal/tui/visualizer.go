@@ -42,21 +42,7 @@ func (v Visualizer) View(styles styles) string {
 		b.WriteString(lipgloss.NewStyle().Foreground(v.color(i)).Render(string(blocks[v.index(value)])))
 		b.WriteRune(' ')
 	}
-	if v.idle() {
-		b.WriteString(styles.help.Render("idle"))
-	} else {
-		b.WriteString(styles.help.Render("harmonica spring viz"))
-	}
 	return b.String()
-}
-
-func (v Visualizer) idle() bool {
-	for _, value := range v.bars {
-		if value > 4 {
-			return false
-		}
-	}
-	return true
 }
 
 func (v Visualizer) index(value float64) int {
