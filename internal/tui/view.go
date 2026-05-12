@@ -39,7 +39,11 @@ func (m Model) statusLine() string {
 		if m.paused {
 			state = "paused: "
 		}
-		return m.styles.status.Render(ansi.Wordwrap(state+m.playing.Name+" <"+m.playing.URL+">", max(20, m.width-4), " /_-<>"))
+		meter := " meter:fallback"
+		if m.energy.Live {
+			meter = " meter:live"
+		}
+		return m.styles.status.Render(ansi.Wordwrap(state+m.playing.Name+meter+" <"+m.playing.URL+">", max(20, m.width-4), " /_-<>"))
 	}
 	return m.styles.status.Render(ansi.Wordwrap(m.status, max(20, m.width-4), " /_-"))
 }

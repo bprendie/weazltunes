@@ -12,6 +12,7 @@ import (
 type Sample struct {
 	Level     float64
 	Transient float64
+	Live      bool
 }
 
 type Meter struct {
@@ -67,7 +68,7 @@ func (m *Meter) read(r io.Reader) {
 			return
 		}
 		level := rms(buf[:n])
-		sample := Sample{Level: level, Transient: math.Max(0, level-previous)}
+		sample := Sample{Level: level, Transient: math.Max(0, level-previous), Live: true}
 		previous = level*0.72 + previous*0.28
 		select {
 		case m.out <- sample:

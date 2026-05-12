@@ -31,17 +31,20 @@ func (v *Visualizer) Step(playing bool, sample audio.Sample) {
 		if playing {
 			base = 3 + 13*v.energyAt(i, sample)
 		}
-		target := base + 5*(0.5+0.5*math.Sin(float64(v.tick)*0.12+float64(i)*0.9))
+		target := base
+		if !sample.Live {
+			target += 5 * (0.5 + 0.5*math.Sin(float64(v.tick)*0.12+float64(i)*0.9))
+		}
 		v.bars[i], v.velocities[i] = v.spring.Update(v.bars[i], v.velocities[i], target)
 	}
 }
 
 func (v Visualizer) energyAt(i int, sample audio.Sample) float64 {
-	if sample.Level == 0 && sample.Transient == 0 {
+	if !sample.Live {
 		return 0.5 + 0.5*math.Sin(float64(v.tick+i)*0.35)
 	}
-	wave := 0.5 + 0.5*math.Sin(float64(v.tick)*0.18+float64(i)*0.72)
-	energy := sample.Level*0.72 + sample.Transient*5.5 + wave*sample.Level*0.42
+	tilt := 0.72 + 0.28*math.Sin(float64(i)*0.63)
+	energy := sample.Level*tilt + sample.Transient*6.5
 	if energy > 1 {
 		return 1
 	}
