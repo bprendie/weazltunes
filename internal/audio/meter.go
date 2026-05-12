@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"context"
 	"encoding/binary"
 	"errors"
 	"io"
@@ -27,6 +28,7 @@ func StartMeter(url string) (*Meter, error) {
 	if err != nil {
 		return nil, errors.New("ffmpeg not found")
 	}
+	url = ResolveStreamURL(context.Background(), url)
 	cmd := exec.Command(bin, "-nostdin", "-v", "error", "-i", url, "-vn", "-f", "s16le", "-ac", "1", "-ar", "8000", "pipe:1")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
