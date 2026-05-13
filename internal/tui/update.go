@@ -72,10 +72,15 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m.input.SetValue("")
 		m.input.Prompt = tunePrompt
 		m.input.Blur()
+		return m, noop
 	case "s":
 		m.stop()
 	}
 	return m, nil
+}
+
+func noop() tea.Msg {
+	return nil
 }
 
 func (m *Model) drainMeter() {
