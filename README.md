@@ -88,8 +88,8 @@ apps on your machine, it can build this.
 - `ctrl+d`: delete selected preset or saved station
 - `space`: pause/resume playback
 - `s`: stop playback
-- `esc`: leave the tune box
-- `q` / `ctrl+c`: quit
+- `esc`: leave the tune box; it does not quit the app
+- `q` / `ctrl+c`: quit the app
 
 ## Tuning
 
