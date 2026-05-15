@@ -61,6 +61,10 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m.startRenameSelected()
 	case "ctrl+d":
 		m.deleteSelected()
+	case "[":
+		m.moveSelected(-1)
+	case "]":
+		m.moveSelected(1)
 	case " ":
 		m.togglePause()
 	case "enter":
@@ -152,7 +156,7 @@ func (m *Model) promoteSelectedOrInput() {
 func (m *Model) resize(width, height int) {
 	m.width = width
 	m.height = height
-	m.list.SetSize(max(20, width-8), max(8, height-18))
+	m.list.SetSize(max(20, width-8), max(12, height-18))
 	m.input.Width = max(20, width-20)
 }
 

@@ -86,6 +86,7 @@ apps on your machine, it can build this.
 - `ctrl+p`: add pasted, selected, or playing station to presets
 - `ctrl+r`: rename selected preset or saved station
 - `ctrl+d`: delete selected preset or saved station
+- `[` / `]`: move selected preset or saved station up/down
 - `space`: pause/resume playback
 - `s`: stop playback
 - `esc`: leave the tune box; it does not quit the app

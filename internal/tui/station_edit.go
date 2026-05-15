@@ -82,6 +82,30 @@ func (m *Model) deleteSelected() {
 	m.status = "deleted " + st.Name
 }
 
+func (m *Model) moveSelected(delta int) {
+	item, ok := m.list.SelectedItem().(stationItem)
+	if !ok || (m.mode != modePresets && m.mode != modeMyStations) {
+		m.err = "select a preset or my station to move"
+		return
+	}
+	st := directoryStation(item)
+	next := -1
+	moved := false
+	if m.mode == modePresets {
+		next, moved = m.cfg.MovePreset(st.URL, delta)
+	} else {
+		next, moved = m.cfg.MoveMyStation(st.URL, delta)
+	}
+	if !moved || !m.saveConfig() {
+		return
+	}
+	m.refreshEditableList()
+	if next >= 0 {
+		m.list.Select(next)
+	}
+	m.status = "moved " + st.Name
+}
+
 func (m *Model) saveConfig() bool {
 	if err := config.Save(m.cfg); err != nil {
 		m.err = err.Error()

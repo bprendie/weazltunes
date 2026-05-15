@@ -85,6 +85,18 @@ func (c *Config) DeleteMyStation(url string) bool {
 	return deleted
 }
 
+func (c *Config) MovePreset(url string, delta int) (int, bool) {
+	next, moved := moveByURL(c.Presets, url, delta)
+	c.Presets = next
+	return moved, moved >= 0
+}
+
+func (c *Config) MoveMyStation(url string, delta int) (int, bool) {
+	next, moved := moveByURL(c.MyStations, url, delta)
+	c.MyStations = next
+	return moved, moved >= 0
+}
+
 func Save(cfg Config) error {
 	path, err := Path()
 	if err != nil {
@@ -156,4 +168,19 @@ func deleteByURL(stations []Preset, url string) ([]Preset, bool) {
 		out = append(out, station)
 	}
 	return out, deleted
+}
+
+func moveByURL(stations []Preset, url string, delta int) ([]Preset, int) {
+	for i := range stations {
+		if !strings.EqualFold(stations[i].URL, url) {
+			continue
+		}
+		next := i + delta
+		if next < 0 || next >= len(stations) {
+			return stations, -1
+		}
+		stations[i], stations[next] = stations[next], stations[i]
+		return stations, next
+	}
+	return stations, -1
 }

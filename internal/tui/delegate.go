@@ -19,8 +19,8 @@ func newStationDelegate() stationDelegate {
 	return stationDelegate{styles: newStyles()}
 }
 
-func (d stationDelegate) Height() int  { return 4 }
-func (d stationDelegate) Spacing() int { return 1 }
+func (d stationDelegate) Height() int  { return 2 }
+func (d stationDelegate) Spacing() int { return 0 }
 func (d stationDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
 	return nil
 }
@@ -33,7 +33,7 @@ func (d stationDelegate) Render(w io.Writer, m list.Model, index int, item list.
 	width := max(10, m.Width()-4)
 	title := ansi.Truncate(st.Title(), width, "...")
 	desc := ansi.Wordwrap(st.Description(), width, " /_-")
-	desc = firstLines(desc, 2)
+	desc = firstLines(desc, 1)
 	titleStyle := d.styles.item
 	descStyle := d.styles.help
 	if index == m.Index() {
