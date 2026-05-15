@@ -30,6 +30,8 @@ On first launch, WeazlTunes drops a fresh `config.json` into
 
 Custom URLs are saved under `my_stations`. Presets stay intentionally tight at
 eight slots, like an old car radio with just enough buttons.
+Promoted stations land at the top, and `[` / `]` let you put the buttons back
+in the order your hands expect.
 
 ## Run
 
