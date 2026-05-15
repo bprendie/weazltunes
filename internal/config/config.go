@@ -18,6 +18,8 @@ type Preset struct {
 	URL  string `json:"url"`
 }
 
+const PresetLimit = 8
+
 func Load() (Config, error) {
 	cfg := defaultConfig()
 	path, err := Path()
@@ -60,8 +62,8 @@ func (c *Config) PromotePreset(st Preset) {
 	}
 	presets := upsert(c.Presets, st)
 	c.Presets = presets
-	if len(c.Presets) > 5 {
-		c.Presets = c.Presets[:5]
+	if len(c.Presets) > PresetLimit {
+		c.Presets = c.Presets[:PresetLimit]
 	}
 }
 

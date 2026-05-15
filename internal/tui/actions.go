@@ -12,7 +12,7 @@ import (
 
 func (m *Model) showPresets() {
 	m.mode = modePresets
-	m.list.Title = "top 5 presets"
+	m.list.Title = "top 8 presets"
 	m.setStations(presetStations(m.cfg))
 	m.status = "presets"
 	m.err = ""

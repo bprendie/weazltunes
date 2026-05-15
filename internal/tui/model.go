@@ -98,7 +98,7 @@ func newSearchInput() textinput.Model {
 
 func newStationList() list.Model {
 	l := list.New(nil, newStationDelegate(), 80, 20)
-	l.Title = "top 5 presets"
+	l.Title = "top 8 presets"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(true)
 	l.SetShowHelp(false)

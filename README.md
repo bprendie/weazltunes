@@ -20,7 +20,7 @@ and `mpv`.
 ## Defaults
 
 On first launch, WeazlTunes drops a fresh `config.json` into
-`~/.config/weazltunes/` with five SomaFM presets:
+`~/.config/weazltunes/` with five SomaFM presets and room for eight quick slots:
 
 - Groove Salad
 - Drone Zone
@@ -29,7 +29,7 @@ On first launch, WeazlTunes drops a fresh `config.json` into
 - Deep Space One
 
 Custom URLs are saved under `my_stations`. Presets stay intentionally tight at
-five slots so they feel like radio buttons, not a junk drawer.
+eight slots, like an old car radio with just enough buttons.
 
 ## Run
 
@@ -77,7 +77,7 @@ apps on your machine, it can build this.
 
 ## Keys
 
-- `1`: top five presets
+- `1`: top eight presets
 - `2`: SomaFM channels
 - `3`: Xiph search mode
 - `4`: my stations
@@ -104,7 +104,7 @@ It gets saved to `my stations` and starts playing immediately. Paste a YouTube
 live URL and WeazlTunes hands it to `mpv` the same way. If `mpv` can resolve it,
 WeazlTunes can tune it.
 
-Press `ctrl+p` on a saved station when it deserves one of the five preset slots.
+Press `ctrl+p` on a saved station when it deserves one of the eight preset slots.
 Newest promotions move to the top, and duplicate URLs are folded together rather
 than copied around like mystery mixtapes.
 
