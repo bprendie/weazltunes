@@ -1,12 +1,8 @@
 package tui
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/bprendie/weazltunes/internal/directory"
 	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m *Model) showPresets() {
@@ -31,26 +27,6 @@ func (m *Model) setStations(stations []directory.Station) {
 		items = append(items, stationItem{station: st})
 	}
 	m.list.SetItems(items)
-}
-
-func (m Model) loadSoma() tea.Cmd {
-	return func() tea.Msg {
-		stations, err := m.client.SomaFM(context.Background())
-		if err != nil {
-			return errMsg{err}
-		}
-		return loadedMsg{stations: stations, status: fmt.Sprintf("loaded %d SomaFM channels", len(stations))}
-	}
-}
-
-func (m Model) searchXiph(q string) tea.Cmd {
-	return func() tea.Msg {
-		stations, err := m.client.XiphSearch(context.Background(), q)
-		if err != nil {
-			return errMsg{err}
-		}
-		return loadedMsg{stations: stations, status: fmt.Sprintf("loaded %d Xiph streams", len(stations))}
-	}
 }
 
 func directoryStation(item stationItem) directory.Station {
